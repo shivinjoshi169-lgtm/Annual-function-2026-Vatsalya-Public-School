@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NINAAD · Vatsalya Public School</title>
-<meta name="description" content="Live departure status, photos & videos, and feedback for NINAAD — Vatsalya Public School's annual function." />
+<meta name="description" content="Live event flow, photos & videos, and feedback for NINAAD — Vatsalya Public School's annual function." />
 
 <!-- ===================== FONTS ===================== -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,7 +40,6 @@
   html, body { background: #0B132B; }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
 
-  /* ---- Royal gradient backdrop + subtle musical geometry ---- */
   .stage {
     background:
       radial-gradient(1100px 600px at 50% -10%, rgba(212,175,55,0.10), transparent 60%),
@@ -53,14 +52,12 @@
   .stage::before {
     content: "";
     position: absolute; inset: 0;
-    background-image:
-      radial-gradient(rgba(212,175,55,0.045) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(212,175,55,0.045) 1px, transparent 1px);
     background-size: 26px 26px;
     pointer-events: none;
     mask-image: linear-gradient(180deg, rgba(0,0,0,0.9), transparent 70%);
   }
 
-  /* ---- Glassmorphism ---- */
   .glass {
     background: rgba(250,248,245,0.045);
     border: 1px solid rgba(212,175,55,0.22);
@@ -76,7 +73,6 @@
 
   .gold-line { background: linear-gradient(90deg, transparent, #D4AF37, transparent); height: 1px; }
 
-  /* ---- Status pulse ---- */
   .pulse-dot { position: relative; }
   .pulse-dot::after {
     content: ""; position: absolute; inset: -4px; border-radius: 9999px;
@@ -88,7 +84,6 @@
   .live-breathe { animation: breathe 2.2s ease-in-out infinite; }
   @keyframes breathe { 0%,100%{opacity:1} 50%{opacity:.35} }
 
-  /* ---- Skeleton shimmer ---- */
   .sk { position: relative; overflow: hidden; background: rgba(250,248,245,0.08); border-radius: 14px; }
   .sk::after {
     content:""; position:absolute; inset:0; transform: translateX(-100%);
@@ -97,7 +92,6 @@
   }
   @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-  /* ---- Toast ---- */
   .toast-in { animation: toastIn .28s ease-out; }
   @keyframes toastIn { from{opacity:0; transform: translateY(12px)} to{opacity:1; transform:translateY(0)} }
 
@@ -117,9 +111,7 @@
   <div id="configBanner" class="hidden relative z-20 mx-auto max-w-3xl px-4 pt-4">
     <div class="glass rounded-2xl p-4 border border-red-400/40 bg-red-500/10 text-sm">
       <p class="font-semibold text-red-200">⚠️ Supabase is not configured yet.</p>
-      <p class="mt-1 text-cream/80">Open <code class="text-gold">index.html</code> and replace
-        <code class="text-gold">SUPABASE_URL</code> and <code class="text-gold">SUPABASE_ANON_KEY</code>
-        near the top of the script with your project values.</p>
+      <p class="mt-1 text-cream/80">Check your Supabase credentials.</p>
     </div>
   </div>
 
@@ -133,19 +125,19 @@
   <!-- ============ TAB NAV ============ -->
   <nav class="relative z-10 px-4">
     <div class="glass mx-auto max-w-2xl rounded-2xl p-1.5 flex gap-1.5">
-      <button data-tab="status"   class="tab flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-semibold transition">Departure Status</button>
+      <button data-tab="flow"     class="tab flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-semibold transition">Event Flow</button>
       <button data-tab="gallery"  class="tab flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-semibold transition text-cream/70">Photos &amp; Videos</button>
       <button data-tab="feedback" class="tab flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-semibold transition text-cream/70">Feedback</button>
     </div>
   </nav>
 
   <!-- ============ MAIN ============ -->
-  <main class="relative z-10 mx-auto max-w-2xl px-4 py-6 pb-24">
+  <main class="relative z-10 mx-auto max-w-2xl px-4 py-6 pb-20">
 
-    <!-- ---------- TAB 1: DEPARTURE STATUS ---------- -->
-    <section id="panel-status" class="tab-panel">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-serifx text-xl text-cream">Live Student Departure</h2>
+    <!-- ---------- TAB 1: LIVE EVENT FLOW ---------- -->
+    <section id="panel-flow" class="tab-panel">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-serifx text-xl text-cream">Live Event Flow</h2>
         <div class="flex items-center gap-2 text-[11px]">
           <span id="liveDot" class="pulse-dot inline-block w-2 h-2 rounded-full bg-emerald-400 text-emerald-400"></span>
           <span id="liveLabel" class="text-cream/70">Connecting…</span>
@@ -153,18 +145,15 @@
         </div>
       </div>
 
-      <p class="text-cream/60 text-xs mb-3">Tap your child's class to see their live pickup status.</p>
+      <!-- Current Live Performance Spotlight -->
+      <div id="nowPlayingWrap" class="mb-6"></div>
 
-      <!-- class selector -->
-      <div id="classGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-5">
-        <div class="sk h-11"></div><div class="sk h-11"></div><div class="sk h-11"></div>
-        <div class="sk h-11"></div><div class="sk h-11"></div><div class="sk h-11"></div>
-      </div>
-
-      <!-- status card -->
-      <div id="statusCard" class="hidden"></div>
-      <div id="statusEmpty" class="glass rounded-2xl p-8 text-center text-cream/60">
-        Select a class above to view its live departure status.
+      <!-- Full Event Lineup -->
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-gold/80 mb-3">Full Program Schedule</h3>
+      <div id="flowList" class="space-y-3">
+        <div class="sk h-20"></div>
+        <div class="sk h-20"></div>
+        <div class="sk h-20"></div>
       </div>
     </section>
 
@@ -236,8 +225,6 @@
   <footer class="relative z-10 text-center pb-9 pt-4 text-cream/40 text-xs">
     <div class="gold-line w-24 mx-auto mb-4 opacity-40"></div>
     <p class="tracking-widest uppercase font-serifx text-cream/60">Vatsalya Public School · NINAAD</p>
-    
-    <!-- Designed & Developed by Shivin Joshi -->
     <div class="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-navy-600/30 border border-gold/15 shadow-inner transition hover:border-gold/40">
       <span class="text-[10px] text-gold/80 tracking-wider uppercase font-semibold">Designed &amp; Developed by</span>
       <span class="text-gold font-bold tracking-wide">Shivin Joshi</span>
@@ -249,36 +236,17 @@
 <div id="toastHost" class="fixed bottom-5 inset-x-0 z-50 flex flex-col items-center gap-2 px-4 pointer-events-none"></div>
 
 <script>
-/* =====================================================================
-   CONFIG  —  PASTE YOUR SUPABASE CREDENTIALS HERE
-   ===================================================================== */
 const SUPABASE_URL      = 'https://hpqqtgewobddztzysaaf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhwcXF0Z2V3b2JkZHp0enlzYWFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1MjA0MTcsImV4cCI6MjExMTA5NjQxN30.QFVIh1ykoMZW6On_XxdK-SifcI9JtdykFpnCNrawC84';
 
-/* =====================================================================
-   CONSTANTS
-   ===================================================================== */
-const STATUS_META = {
-  'Event in Progress':       { label: 'Event in Progress',       badge: 'bg-amber-500/20 text-amber-300 border-amber-400/40',   dot: 'text-amber-400',   ring: 'ring-amber-400/30' },
-  'Preparing for Departure': { label: 'Preparing for Departure', badge: 'bg-yellow-400/20 text-yellow-200 border-yellow-300/40', dot: 'text-yellow-300',  ring: 'ring-yellow-300/30' },
-  'Ready for Pickup':        { label: 'Ready for Pickup',        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40', dot: 'text-emerald-400', ring: 'ring-emerald-400/40' },
-};
-const LS_CLASS_KEY = 'ninaad_selected_class';
-
-/* =====================================================================
-   STATE
-   ===================================================================== */
 let sb = null;
-let classes = [];                 // rows from class_data
-let settings = null;              // event_settings row
-let selectedClassId = null;
+let eventFlow = [];
+let classes = [];
+let settings = null;
 let channel = null;
 let reconnectTimer = null;
 let reconnectDelay = 2000;
 
-/* =====================================================================
-   HELPERS
-   ===================================================================== */
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
@@ -289,24 +257,17 @@ function toast(msg, kind = 'ok') {
     ? 'bg-red-600 text-white'
     : (kind === 'warn' ? 'bg-amber-500 text-navy' : 'bg-navy-700 text-gold border border-gold/40');
   el.className = `toast-in pointer-events-auto max-w-sm w-full text-sm font-medium px-4 py-3 rounded-xl shadow-lg ${tone}`;
-  el.textContent = msg;                       // XSS-safe
+  el.textContent = msg;
   host.appendChild(el);
   setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3200);
 }
 
-// Normalize + validate a Google Drive / external URL. Returns '' if unusable.
 function safeUrl(raw) {
   if (!raw) return '';
   let u = String(raw).trim();
   if (!u) return '';
   if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
   try { const parsed = new URL(u); return (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.href : ''; }
-  catch { return ''; }
-}
-
-function fmtTime(iso) {
-  if (!iso) return '';
-  try { return new Date(iso).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }); }
   catch { return ''; }
 }
 
@@ -318,94 +279,79 @@ function setLive(state) {
   else                       { dot.className = 'inline-block w-2 h-2 rounded-full bg-red-400 live-breathe';                   label.textContent = 'Offline — tap ⟳'; }
 }
 
-/* =====================================================================
-   RENDER — CLASS SELECTOR
-   ===================================================================== */
-function renderClassGrid() {
-  const grid = $('#classGrid');
-  grid.innerHTML = '';
-  classes.forEach(c => {
-    const btn = document.createElement('button');
-    const active = c.id === selectedClassId;
-    btn.className = 'rounded-xl py-3 px-1 text-sm font-semibold border transition ' +
-      (active ? 'bg-gold text-navy border-gold shadow-lg' : 'bg-navy-600/50 text-cream/80 border-gold/15 hover:border-gold/40');
-    btn.textContent = c.class_name;           // XSS-safe
-    btn.addEventListener('click', () => selectClass(c.id));
-    grid.appendChild(btn);
+function renderEventFlow() {
+  const spotlight = $('#nowPlayingWrap');
+  const list = $('#flowList');
+  spotlight.innerHTML = '';
+  list.innerHTML = '';
+
+  const liveItem = eventFlow.find(item => item.status === 'Live on Stage');
+
+  if (liveItem) {
+    const card = document.createElement('div');
+    card.className = 'glass rounded-2xl p-6 border-2 border-emerald-400/50 bg-emerald-500/[0.06] fade-in relative overflow-hidden';
+
+    const badge = document.createElement('div');
+    badge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold tracking-wider uppercase';
+    const dot = document.createElement('span');
+    dot.className = 'pulse-dot w-2 h-2 rounded-full bg-emerald-400 text-emerald-400';
+    const bTxt = document.createElement('span');
+    bTxt.textContent = 'Now Performing on Stage';
+    badge.append(dot, bTxt);
+
+    const title = document.createElement('h3');
+    title.className = 'font-serifx text-2xl sm:text-3xl text-cream mt-3';
+    title.textContent = liveItem.title;
+
+    const perf = document.createElement('p');
+    perf.className = 'text-gold font-medium text-sm mt-1.5 flex items-center gap-1.5';
+    perf.textContent = '🎭 ' + (liveItem.performers || 'Participants');
+
+    card.append(badge, title, perf);
+    spotlight.appendChild(card);
+  } else {
+    const idle = document.createElement('div');
+    idle.className = 'glass rounded-2xl p-5 text-center text-cream/70 text-sm fade-in';
+    idle.textContent = '✨ Stay tuned! The next performance will begin shortly.';
+    spotlight.appendChild(idle);
+  }
+
+  if (!eventFlow.length) {
+    list.innerHTML = '<div class="glass rounded-2xl p-6 text-center text-cream/60 text-sm">Event schedule will be updated shortly.</div>';
+    return;
+  }
+
+  eventFlow.forEach((item, idx) => {
+    const isLive = item.status === 'Live on Stage';
+
+    const row = document.createElement('div');
+    row.className = 'rounded-2xl p-4 border transition flex items-center justify-between gap-3 ' +
+      (isLive ? 'bg-emerald-500/10 border-emerald-400/50 shadow-lg ring-2 ring-emerald-400/30' : 'glass border-gold/20');
+
+    const left = document.createElement('div');
+    left.className = 'flex items-start gap-3 min-w-0';
+
+    const num = document.createElement('div');
+    num.className = 'w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-xs font-bold ' +
+      (isLive ? 'bg-emerald-400 text-navy' : 'bg-gold/15 text-gold border border-gold/30');
+    num.textContent = String(idx + 1);
+
+    const info = document.createElement('div');
+    info.className = 'min-w-0';
+    const t = document.createElement('div');
+    t.className = 'font-semibold text-sm sm:text-base ' + (isLive ? 'text-emerald-300 font-bold' : 'text-cream');
+    t.textContent = item.title;
+    const p = document.createElement('div');
+    p.className = 'text-xs text-cream/60 mt-0.5';
+    p.textContent = item.performers;
+    info.append(t, p);
+
+    left.append(num, info);
+    row.appendChild(left);
+    list.appendChild(row);
   });
 }
 
-function selectClass(id) {
-  selectedClassId = id;
-  try { localStorage.setItem(LS_CLASS_KEY, String(id)); } catch {}
-  renderClassGrid();
-  renderStatusCard();
-}
-
-/* =====================================================================
-   RENDER — STATUS CARD
-   ===================================================================== */
-function renderStatusCard() {
-  const card = $('#statusCard'), empty = $('#statusEmpty');
-  const c = classes.find(x => x.id === selectedClassId);
-  if (!c) { card.classList.add('hidden'); empty.classList.remove('hidden'); return; }
-  empty.classList.add('hidden'); card.classList.remove('hidden');
-
-  const meta = STATUS_META[c.departure_status] || STATUS_META['Event in Progress'];
-
-  card.className = `glass rounded-2xl p-6 fade-in ring-2 ${meta.ring}`;
-  card.innerHTML = '';   // safe: rebuilt from trusted structure + textContent below
-
-  const top = document.createElement('div');
-  top.className = 'flex items-start justify-between gap-3';
-  const left = document.createElement('div');
-  const h = document.createElement('h3');
-  h.className = 'font-serifx text-2xl text-cream';
-  h.textContent = c.class_name;
-  const sub = document.createElement('p');
-  sub.className = 'text-cream/50 text-xs mt-1';
-  sub.textContent = c.updated_at ? ('Updated ' + fmtTime(c.updated_at)) : 'Live';
-  left.append(h, sub);
-
-  const badge = document.createElement('div');
-  badge.className = `shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${meta.badge}`;
-  const bdot = document.createElement('span');
-  bdot.className = `pulse-dot w-2 h-2 rounded-full bg-current ${meta.dot}`;
-  const bl = document.createElement('span');
-  bl.textContent = meta.label;
-  badge.append(bdot, bl);
-  top.append(left, badge);
-  card.appendChild(top);
-
-  // big status line
-  const big = document.createElement('div');
-  big.className = 'mt-6 text-center';
-  const bigIcon = document.createElement('div');
-  bigIcon.className = 'text-4xl';
-  bigIcon.textContent = c.departure_status === 'Ready for Pickup' ? '✅'
-                      : c.departure_status === 'Preparing for Departure' ? '🎒' : '🎭';
-  const bigTxt = document.createElement('div');
-  bigTxt.className = 'font-semibold text-lg mt-2 ' +
-    (c.departure_status === 'Ready for Pickup' ? 'text-emerald-300'
-     : c.departure_status === 'Preparing for Departure' ? 'text-yellow-200' : 'text-amber-300');
-  bigTxt.textContent = meta.label;
-  big.append(bigIcon, bigTxt);
-  card.appendChild(big);
-
-  // gate note
-  if (c.departure_note && c.departure_note.trim()) {
-    const note = document.createElement('div');
-    note.className = 'mt-5 rounded-xl bg-gold/10 border border-gold/30 px-4 py-3 text-sm text-gold-soft flex gap-2';
-    const pin = document.createElement('span'); pin.textContent = '📍';
-    const t = document.createElement('span'); t.textContent = c.departure_note.trim();
-    note.append(pin, t);
-    card.appendChild(note);
-  }
-}
-
-/* =====================================================================
-   RENDER — GALLERY
-   ===================================================================== */
 function renderGallery() {
   const wrap = $('#galleryWrap');
   wrap.innerHTML = '';
@@ -426,7 +372,6 @@ function renderGallery() {
     return;
   }
 
-  // RELEASED
   const secA = document.createElement('div');
   secA.className = 'fade-in';
   const aTitle = document.createElement('h2'); aTitle.className = 'font-serifx text-xl text-cream mb-3'; aTitle.textContent = 'Performances & Highlights';
@@ -482,31 +427,23 @@ function mediaCard(icon, title, subtitle, url) {
   return el;
 }
 
-/* =====================================================================
-   DATA FETCH
-   ===================================================================== */
 async function fetchAll() {
   if (!sb) return;
   try {
-    const [cRes, sRes] = await Promise.all([
+    const [fRes, cRes, sRes] = await Promise.all([
+      sb.from('event_flow').select('*').order('sort_order', { ascending: true }),
       sb.from('class_data').select('*').order('sort_order', { ascending: true }),
       sb.from('event_settings').select('*').eq('id', 1).single(),
     ]);
+    if (fRes.error) throw fRes.error;
     if (cRes.error) throw cRes.error;
     if (sRes.error) throw sRes.error;
 
-    classes  = cRes.data || [];
-    settings = sRes.data || null;
+    eventFlow = fRes.data || [];
+    classes   = cRes.data || [];
+    settings  = sRes.data || null;
 
-    // restore selected class from localStorage (first load only)
-    if (selectedClassId === null) {
-      let saved = null;
-      try { saved = localStorage.getItem(LS_CLASS_KEY); } catch {}
-      if (saved && classes.some(c => c.id === Number(saved))) selectedClassId = Number(saved);
-    }
-
-    renderClassGrid();
-    renderStatusCard();
+    renderEventFlow();
     renderGallery();
     populateFeedbackClasses();
   } catch (e) {
@@ -515,21 +452,19 @@ async function fetchAll() {
   }
 }
 
-/* =====================================================================
-   REALTIME  (with auto-reconnect)
-   ===================================================================== */
 function subscribeRealtime() {
   if (!sb) return;
   setLive('conn');
   if (channel) { try { sb.removeChannel(channel); } catch {} channel = null; }
 
   channel = sb.channel('ninaad-public')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'event_flow' },     () => fetchAll())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'class_data' },     () => fetchAll())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'event_settings' }, () => fetchAll())
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') {
         setLive('live');
-        reconnectDelay = 2000;                 // reset backoff
+        reconnectDelay = 2000;
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
         setLive('off');
         scheduleReconnect();
@@ -541,22 +476,18 @@ function scheduleReconnect() {
   if (reconnectTimer) return;
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null;
-    reconnectDelay = Math.min(reconnectDelay * 1.6, 15000);   // exponential backoff, capped
+    reconnectDelay = Math.min(reconnectDelay * 1.6, 15000);
     fetchAll();
     subscribeRealtime();
   }, reconnectDelay);
 }
 
-/* =====================================================================
-   FEEDBACK
-   ===================================================================== */
 let fbRating = 0;
 let fbCooldownUntil = 0;
 
 function populateFeedbackClasses() {
   const sel = $('#fbClass');
   const current = sel.value;
-  // keep placeholder, rebuild options
   sel.querySelectorAll('option:not([value=""])').forEach(o => o.remove());
   classes.forEach(c => {
     const o = document.createElement('option');
@@ -599,7 +530,7 @@ function initFeedback() {
       });
       if (error) throw error;
 
-      fbCooldownUntil = Date.now() + 15000;      // 15s anti-double-submit
+      fbCooldownUntil = Date.now() + 15000;
       $('#feedbackForm').classList.add('hidden');
       $('#fbThanks').classList.remove('hidden');
     } catch (err) {
@@ -618,9 +549,6 @@ function initFeedback() {
   });
 }
 
-/* =====================================================================
-   TABS
-   ===================================================================== */
 function initTabs() {
   $$('.tab').forEach(t => {
     t.addEventListener('click', () => {
@@ -631,12 +559,9 @@ function initTabs() {
       $(`#panel-${name}`).classList.remove('hidden');
     });
   });
-  $('.tab[data-tab="status"]').click();
+  $('.tab[data-tab="flow"]').click();
 }
 
-/* =====================================================================
-   BOOT
-   ===================================================================== */
 function boot() {
   initTabs();
   initFeedback();
@@ -655,7 +580,6 @@ function boot() {
   fetchAll();
   subscribeRealtime();
 
-  // resync when the tab regains focus / network returns (weak auditorium Wi-Fi)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { fetchAll(); subscribeRealtime(); } });
   window.addEventListener('online', () => { fetchAll(); subscribeRealtime(); });
 }
