@@ -279,6 +279,22 @@ function setLive(state) {
   else                       { dot.className = 'inline-block w-2 h-2 rounded-full bg-red-400 live-breathe';                   label.textContent = 'Offline — tap ⟳'; }
 }
 
+function parseTimeToMinutes(timeStr) {
+  if (!timeStr) return 18 * 60;
+  const parts = timeStr.split(':');
+  return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
+}
+
+function formatMinutesToTime(totalMins) {
+  totalMins = ((totalMins % (24 * 60)) + (24 * 60)) % (24 * 60);
+  let h = Math.floor(totalMins / 60);
+  let m = totalMins % 60;
+  let hour12 = h % 12 === 0 ? 12 : h % 12;
+  let ampm = h >= 12 ? 'PM' : 'AM';
+  let minStr = m < 10 ? '0' + m : m;
+  return `${hour12}:${minStr} ${ampm}`;
+}
+
 function renderEventFlow() {
   const spotlight = $('#nowPlayingWrap');
   const list = $('#flowList');
@@ -321,33 +337,52 @@ function renderEventFlow() {
     return;
   }
 
+  // TRAIN TRACKER CASCADING LOGIC
+  let runningMins = parseTimeToMinutes(settings?.event_start_time || '18:00');
+
   eventFlow.forEach((item, idx) => {
     const isLive = item.status === 'Live on Stage';
+    const isDone = item.status === 'Completed';
+    const duration = item.duration_mins || 10;
+
+    // If this performance has a locked actual_start_time (Completed or Live), anchor to it!
+    // Past performances stay frozen at their actual/original time; future ones cascade forward from the latest anchor.
+    if (item.actual_start_time) {
+      runningMins = parseTimeToMinutes(item.actual_start_time);
+    }
+
+    const startTimeFormatted = formatMinutesToTime(runningMins);
+    runningMins += duration;
 
     const row = document.createElement('div');
     row.className = 'rounded-2xl p-4 border transition flex items-center justify-between gap-3 ' +
-      (isLive ? 'bg-emerald-500/10 border-emerald-400/50 shadow-lg ring-2 ring-emerald-400/30' : 'glass border-gold/20');
+      (isLive ? 'bg-emerald-500/10 border-emerald-400/50 shadow-lg ring-2 ring-emerald-400/30'
+      : isDone ? 'glass border-white/10 opacity-75'
+      : 'glass border-gold/20');
 
     const left = document.createElement('div');
     left.className = 'flex items-start gap-3 min-w-0';
 
     const num = document.createElement('div');
     num.className = 'w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-xs font-bold ' +
-      (isLive ? 'bg-emerald-400 text-navy' : 'bg-gold/15 text-gold border border-gold/30');
-    num.textContent = String(idx + 1);
+      (isLive ? 'bg-emerald-400 text-navy'
+      : isDone ? 'bg-white/10 text-cream/50'
+      : 'bg-gold/15 text-gold border border-gold/30');
+    num.textContent = isDone ? '✓' : String(idx + 1);
 
     const info = document.createElement('div');
     info.className = 'min-w-0';
     const t = document.createElement('div');
-    t.className = 'font-semibold text-sm sm:text-base ' + (isLive ? 'text-emerald-300 font-bold' : 'text-cream');
+    t.className = 'font-semibold text-sm sm:text-base ' + (isLive ? 'text-emerald-300 font-bold' : isDone ? 'text-cream/70' : 'text-cream');
     t.textContent = item.title;
-    const p = document.createElement('div');
-    p.className = 'text-xs text-cream/60 mt-0.5';
-    p.textContent = item.performers;
-    info.append(t, p);
 
+    const sub = document.createElement('div');
+    sub.className = 'text-xs text-cream/60 mt-0.5 flex items-center gap-2 flex-wrap';
+    sub.innerHTML = `<span>🎭 ${item.performers}</span> • <span class="${isLive ? 'text-emerald-300 font-semibold' : 'text-gold'}">🕒 ${startTimeFormatted}</span>`;
+
+    info.append(t, sub);
     left.append(num, info);
-    row.appendChild(left);
+    row.append(left);
     list.appendChild(row);
   });
 }
